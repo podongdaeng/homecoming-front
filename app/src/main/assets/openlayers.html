@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/css/ol.css" type="text/css">
+</head>
+<body>
+<div id="map" style="width: 400px; height: 800px;" class="map"></div>
+<script src="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/build/ol.js"></script>
+<script>
+        var param = {
+            name: '여성밤길치안안전 - 전체',
+            serverUrl: 'https://www.safemap.go.kr/openApiService/wms/getLayerData.do?apikey=0B3O17CH-0B3O-0B3O-0B3O-0B3O17CHIK',
+            layername: 'A2SM_CRMNLHSPOT_F1_TOT',
+            styles: 'A2SM_OdblrCrmnlHspot_Tot_20_24'
+        };
+
+        var wmsLayer = new ol.layer.Image({
+            source: new ol.source.ImageWMS({
+                url: param.serverUrl,
+                params: {
+                    'LAYERS': param.layername,
+                    'STYLES': param.styles,
+                    'FORMAT': 'image/png',
+                    'EXCEPTIONS': 'text/xml',
+                    'TRANSPARENT': true
+                },
+            }),
+            name: param.name,
+            isBaseLayer: false,
+        });
+
+        var map = new ol.Map({
+            target: 'map',
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.OSM()
+                }),
+                wmsLayer // Add the WMS layer to the map
+            ],
+            view: new ol.View({
+                center: [0,0],
+                zoom: 2
+            })
+        });
+
+</script>
+</body>
+</html>
