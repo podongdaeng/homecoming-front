@@ -1,48 +1,212 @@
 <!DOCTYPE html>
-<html>
-<head>
-    <link rel="stylesheet" href="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/css/ol.css" type="text/css">
-</head>
-<body>
-<div id="map" style="width: 400px; height: 800px;" class="map"></div>
-<script src="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/build/ol.js"></script>
-<script>
-        var param = {
-            name: '여성밤길치안안전 - 전체',
-            serverUrl: 'https://www.safemap.go.kr/openApiService/wms/getLayerData.do?apikey=0B3O17CH-0B3O-0B3O-0B3O-0B3O17CHIK',
-            layername: 'A2SM_CRMNLHSPOT_F1_TOT',
-            styles: 'A2SM_OdblrCrmnlHspot_Tot_20_24'
-        };
+<html lang="ko" class="hfix"><head>
+    <meta charset="utf-8">
+    <title>Sample DataAPI</title>
+    <meta name="author" content="Kim kwangsung, Lim seonju">
+    <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,target-densitydpi=medium-dpi">
+    <meta name="keywords" content="생활안전지도,안전지도">
+    <meta name="description" content="생활안전지도포털 사이트에 오신것을 환영합니다.본 페이지는 WCAG2.0,KWCAG2.0 및 미래창조과학부의 정보시스템의 구축 운영 기술 지침을 준수하여 제작하였습니다.">
+    <meta http-equiv="X-UA-Compatible" content="IE=10">
 
-        var wmsLayer = new ol.layer.Image({
-            source: new ol.source.ImageWMS({
-                url: param.serverUrl,
-                params: {
-                    'LAYERS': param.layername,
-                    'STYLES': param.styles,
-                    'FORMAT': 'image/png',
-                    'EXCEPTIONS': 'text/xml',
-                    'TRANSPARENT': true
-                },
-            }),
-            name: param.name,
-            isBaseLayer: false,
-        });
+    <script src="/js/8open/jquery.js"></script>
+    <script src="/js/8open/jquery.easing.1.3.js"></script>
+    <script src="/js/8open/common.js"></script>
+    <script src="/js/8open/selcheck.js"></script>
+    <script src="/js/8open/jquery.slimscroll.js"></script>
 
-        var map = new ol.Map({
-            target: 'map',
-            layers: [
-                new ol.layer.Tile({
-                    source: new ol.source.OSM()
-                }),
-                wmsLayer // Add the WMS layer to the map
-            ],
-            view: new ol.View({
-                center: [0,0],
-                zoom: 2
-            })
-        });
+    <script src="/js/2dmap_new/common_new.js"></script>
+    <script src="/js/2dmap_new/jquery-1.10.2.min.js"></script>
+    <script src="/js/2dmap_new/jquery.bxslider.js"></script>
+    <script src="/js/2dmap_new/jquery-ui-1.10.3.custom.min.js"></script>
+    <script src="/js/2dmap_new/jquery.ui.datepicker-ko.js"></script>
 
+    <!-- <script src="http://www.openlayers.org/api/2.13/OpenLayers.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/openlayers/2.13.1/OpenLayers.js"></script>
+    <script src="/js/vworld.openapi.js"></script>
+    <script src="https://map.vworld.kr/js/apis.do?type=Base&amp;apiKey=CAAABC8F-5A97-3763-9580-B3F36F6372A1&amp;domain=www.safemap.go.kr"></script><script src="https://map.vworld.kr/checkAPINum.do?key=CAAABC8F-5A97-3763-9580-B3F36F6372A1&amp;type=TMS" type="text/javascript"></script>
+
+    <script>
+var map;
+var mapBounds = new OpenLayers.Bounds(123 , 32, 134 , 43);
+var mapMinZoom = 7;
+var mapMaxZoom = 19;
+
+// avoid pink tiles
+OpenLayers.IMAGE_RELOAD_ATTEMPTS = 3;
+OpenLayers.Util.onImageLoadErrorColor = "transparent";
+
+function init(){
+
+	var options = {
+	    controls: [],
+	    projection: new OpenLayers.Projection("EPSG:900913"),
+	    displayProjection: new OpenLayers.Projection("EPSG:4326"),
+	    units: "m",
+	    controls : [],
+	    numZoomLevels:21,
+	    maxResolution: 156543.0339,
+	    maxExtent: new OpenLayers.Bounds(-20037508.34, -20037508.34, 20037508.34, 20037508.34)
+	    };
+	map = new OpenLayers.Map('basemap', options);
+
+	//======================================
+	//1. 배경지도 추가하기
+	vBase = new vworld.Layers.Base('VBASE');
+	if (vBase != null){map.addLayer(vBase);}
+
+	var switcherControl = new OpenLayers.Control.LayerSwitcher();
+	map.addControl(switcherControl);
+	switcherControl.maximizeControl();
+
+	map.zoomToExtent( mapBounds.transform(map.displayProjection, map.projection ) );
+	map.panTo(new OpenLayers.LonLat(14140009.710048,4524707.4183749));
+	//  map.panTo(14140740.892214,4521395.6921268);
+	if("A2SM_CRMNLHSPOT_F1_TOT"=="A2SM_CMMNPOI"){
+		map.zoomTo(17);
+	}else{
+		map.zoomTo(14);
+	}
+
+	map.addControl(new OpenLayers.Control.PanZoomBar());
+	map.addControl(new OpenLayers.Control.MousePosition());
+	map.addControl(new OpenLayers.Control.Navigation());
+	//map.addControl(new OpenLayers.Control.MouseDefaults()); //2.12 No Support
+	map.addControl(new OpenLayers.Control.Attribution({separator:" "}));
+	addWmsLayer();
+	// addLegend();
+}
+
+function addWmsLayer(){
+	param = {name:"여성밤길치안안전 - 전체",
+			serverUrl:"https://geo.safemap.go.kr/geoserver/safemap/wms",
+			layername:"A2SM_CRMNLHSPOT_F1_TOT",
+			styles:"A2SM_OdblrCrmnlHspot_Tot_20_24"};
+	var wmsLayer = new OpenLayers.Layer.WMS( param.name, param.serverUrl,
+					      {layers: ''+param.layername,
+						   styles:param.styles,
+						   format: 'image/png',
+						   exceptions:'text/xml',
+						   transparent: true},
+					      {isBaseLayer: false}
+		               );
+	map.addLayer(wmsLayer);
+	$('#basemap').height($(window).height()-20);
+}
+
+function addLegend() {
+
+	var html = "";
+	html += "<div>";
+	html += "	<span>분류 : 치안안전</span></br>";
+	html += "	<span>서비스 : 여성밤길치안안전 - 전체</span></br>";
+	html += "	<span>기준일 : 2021.07 ~ 2022.06</span></br>";
+	html += "	<span>제공처 : 경찰청</span></br>";
+	html += "	<span>(아이콘 이미지는 오픈API 자료실에서 다운로드 가능합니다.)"
+	/* console.log("Category : 치안안전"
+			+ "\nName : 여성밤길치안안전 - 전체"
+			+ "\nStdrde : 2021.07 ~ 2022.06"
+			+ "\nProvide : 경찰청"); */
+
+	html += "	<ul>";
+
+		html += "	<li style='height: 40px;'>";
+		html += "		 ";
+		html += "		#ffffb2, ";
+		html += "		1등급";
+		html += "	</li>";
+		//console.log("NO : 1, NM : 1등급, RANGE : null ");
+
+		html += "	<li style='height: 40px;'>";
+		html += "		 ";
+		html += "		#fee88b, ";
+		html += "		2등급";
+		html += "	</li>";
+		//console.log("NO : 2, NM : 2등급, RANGE : null ");
+
+		html += "	<li style='height: 40px;'>";
+		html += "		 ";
+		html += "		#fed165, ";
+		html += "		3등급";
+		html += "	</li>";
+		//console.log("NO : 3, NM : 3등급, RANGE : null ");
+
+		html += "	<li style='height: 40px;'>";
+		html += "		 ";
+		html += "		#fdb751, ";
+		html += "		4등급";
+		html += "	</li>";
+		//console.log("NO : 4, NM : 4등급, RANGE : null ");
+
+		html += "	<li style='height: 40px;'>";
+		html += "		 ";
+		html += "		#fd9b43, ";
+		html += "		5등급";
+		html += "	</li>";
+		//console.log("NO : 5, NM : 5등급, RANGE : null ");
+
+		html += "	<li style='height: 40px;'>";
+		html += "		 ";
+		html += "		#fa7a35, ";
+		html += "		6등급";
+		html += "	</li>";
+		//console.log("NO : 6, NM : 6등급, RANGE : null ");
+
+		html += "	<li style='height: 40px;'>";
+		html += "		 ";
+		html += "		#f45629, ";
+		html += "		7등급";
+		html += "	</li>";
+		//console.log("NO : 7, NM : 7등급, RANGE : null ");
+
+		html += "	<li style='height: 40px;'>";
+		html += "		 ";
+		html += "		#ea3420, ";
+		html += "		8등급";
+		html += "	</li>";
+		//console.log("NO : 8, NM : 8등급, RANGE : null ");
+
+		html += "	<li style='height: 40px;'>";
+		html += "		 ";
+		html += "		#d31a23, ";
+		html += "		9등급";
+		html += "	</li>";
+		//console.log("NO : 9, NM : 9등급, RANGE : null ");
+
+		html += "	<li style='height: 40px;'>";
+		html += "		 ";
+		html += "		#bd0026, ";
+		html += "		10등급";
+		html += "	</li>";
+		//console.log("NO : 10, NM : 10등급, RANGE : null ");
+
+	html += "	</ul>";
+	html += "</div>";
+
+	$(".legend").html(html);
+}
 </script>
-</body>
-</html>
+    <style type="text/css">
+.legend
+{
+	overflow: scroll;
+	position: absolute;
+	z-index: 9999;
+	right: 30px;
+	bottom: 30px;
+	width: 580px;
+	height: 230px;
+	background: #fff;
+	padding: 10px;
+}
+/* Geoserver 에러 분홍색 이미지 표현안되도록 */
+.olTileImage.olImageLoadError {
+    display: none !important;
+}
+</style>
+    <style type="text/css">input.cfe-styled { display: none; } select.cfe-styled, input.cfe-styled[type=file] { position: relative; display: block; opacity: 0; -ms-filter:"progid:DXImageTransform.Microsoft.Alpha"(Opacity=0); filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0); filter:alpha(opacity=0); z-index: 5; } </style><link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/openlayers/2.13.1/theme/default/style.css"></head>
+<body onload="init()" style="">
+<div id="basemap" style="height: 891px;" class="olMap">
+    <!-- <div class="legend"></div> -->
+    <div id="OpenLayers_Map_2_OpenLayers_ViewPort" class="olMapViewport vworldWaterMarkActive olControlMousePositionActive olControlDragPanActive olControlZoomBoxActive olControlPinchZoomActive olControlNavigationActive" style="position: relative; overflow: hidden; width: 100%; height: 100%;"><div id="OpenLayers_Map_2_OpenLayers_Container" style="position: absolute; z-index: 749; left: 0px; top: 0px;"><div id="vworld_Layers_Base_4" dir="ltr" class="olLayerDiv olLayerGrid" style="position: absolute; width: 100%; height: 100%; z-index: 100;"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: 302px; top: 402px; width: 256px; height: 256px;" src="https://xdworld.vworld.kr/2d/Base/service/16/55891/25369.png"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: 302px; top: 146px; width: 256px; height: 256px;" src="https://xdworld.vworld.kr/2d/Base/service/16/55891/25368.png"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: 46px; top: 402px; width: 256px; height: 256px;" src="https://xdworld.vworld.kr/2d/Base/service/16/55890/25369.png"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: 558px; top: 402px; width: 256px; height: 256px;" src="https://xdworld.vworld.kr/2d/Base/service/16/55892/25369.png"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: 46px; top: 146px; width: 256px; height: 256px;" src="https://xdworld.vworld.kr/2d/Base/service/16/55890/25368.png"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: 558px; top: 146px; width: 256px; height: 256px;" src="https://xdworld.vworld.kr/2d/Base/service/16/55892/25368.png"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: 302px; top: 658px; width: 256px; height: 256px;" src="https://xdworld.vworld.kr/2d/Base/service/16/55891/25370.png"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: 46px; top: 658px; width: 256px; height: 256px;" src="https://xdworld.vworld.kr/2d/Base/service/16/55890/25370.png"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: 302px; top: -110px; width: 256px; height: 256px;" src="https://xdworld.vworld.kr/2d/Base/service/16/55891/25367.png"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: 558px; top: 658px; width: 256px; height: 256px;" src="https://xdworld.vworld.kr/2d/Base/service/16/55892/25370.png"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: 46px; top: -110px; width: 256px; height: 256px;" src="https://xdworld.vworld.kr/2d/Base/service/16/55890/25367.png"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: -210px; top: 402px; width: 256px; height: 256px;" src="https://xdworld.vworld.kr/2d/Base/service/16/55889/25369.png"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: 558px; top: -110px; width: 256px; height: 256px;" src="https://xdworld.vworld.kr/2d/Base/service/16/55892/25367.png"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: -210px; top: 146px; width: 256px; height: 256px;" src="https://xdworld.vworld.kr/2d/Base/service/16/55889/25368.png"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: 814px; top: 402px; width: 256px; height: 256px;" src="https://xdworld.vworld.kr/2d/Base/service/16/55893/25369.png"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: 814px; top: 146px; width: 256px; height: 256px;" src="https://xdworld.vworld.kr/2d/Base/service/16/55893/25368.png"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: 302px; top: 914px; width: 256px; height: 256px;" src="https://xdworld.vworld.kr/2d/Base/service/16/55891/25371.png"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: -210px; top: 658px; width: 256px; height: 256px;" src="https://xdworld.vworld.kr/2d/Base/service/16/55889/25370.png"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: 814px; top: 658px; width: 256px; height: 256px;" src="https://xdworld.vworld.kr/2d/Base/service/16/55893/25370.png"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: 46px; top: 914px; width: 256px; height: 256px;" src="https://xdworld.vworld.kr/2d/Base/service/16/55890/25371.png"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: -210px; top: -110px; width: 256px; height: 256px;" src="https://xdworld.vworld.kr/2d/Base/service/16/55889/25367.png"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: 558px; top: 914px; width: 256px; height: 256px;" src="https://xdworld.vworld.kr/2d/Base/service/16/55892/25371.png"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: 814px; top: -110px; width: 256px; height: 256px;" src="https://xdworld.vworld.kr/2d/Base/service/16/55893/25367.png"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: -210px; top: 914px; width: 256px; height: 256px;" src="https://xdworld.vworld.kr/2d/Base/service/16/55889/25371.png"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: 814px; top: 914px; width: 256px; height: 256px;" src="https://xdworld.vworld.kr/2d/Base/service/16/55893/25371.png"></div><div id="OpenLayers_Layer_WMS_122" dir="ltr" class="olLayerDiv olLayerGrid" style="position: absolute; width: 100%; height: 100%; z-index: 330;"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: 302px; top: 402px; width: 256px; height: 256px;" src="https://geo.safemap.go.kr/geoserver/safemap/wms?LAYERS=A2SM_CRMNLHSPOT_F1_TOT&amp;STYLES=A2SM_OdblrCrmnlHspot_Tot_20_24&amp;FORMAT=image%2Fpng&amp;EXCEPTIONS=text%2Fxml&amp;TRANSPARENT=TRUE&amp;SERVICE=WMS&amp;VERSION=1.1.1&amp;REQUEST=GetMap&amp;SRS=EPSG%3A900913&amp;BBOX=14139627.236972,4523849.0804195,14140238.733198,4524460.5766457&amp;WIDTH=256&amp;HEIGHT=256"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: 302px; top: 146px; width: 256px; height: 256px;" src="https://geo.safemap.go.kr/geoserver/safemap/wms?LAYERS=A2SM_CRMNLHSPOT_F1_TOT&amp;STYLES=A2SM_OdblrCrmnlHspot_Tot_20_24&amp;FORMAT=image%2Fpng&amp;EXCEPTIONS=text%2Fxml&amp;TRANSPARENT=TRUE&amp;SERVICE=WMS&amp;VERSION=1.1.1&amp;REQUEST=GetMap&amp;SRS=EPSG%3A900913&amp;BBOX=14139627.236972,4524460.5766457,14140238.733198,4525072.0728719&amp;WIDTH=256&amp;HEIGHT=256"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: 46px; top: 402px; width: 256px; height: 256px;" src="https://geo.safemap.go.kr/geoserver/safemap/wms?LAYERS=A2SM_CRMNLHSPOT_F1_TOT&amp;STYLES=A2SM_OdblrCrmnlHspot_Tot_20_24&amp;FORMAT=image%2Fpng&amp;EXCEPTIONS=text%2Fxml&amp;TRANSPARENT=TRUE&amp;SERVICE=WMS&amp;VERSION=1.1.1&amp;REQUEST=GetMap&amp;SRS=EPSG%3A900913&amp;BBOX=14139015.740746,4523849.0804195,14139627.236972,4524460.5766457&amp;WIDTH=256&amp;HEIGHT=256"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: 558px; top: 402px; width: 256px; height: 256px;" src="https://geo.safemap.go.kr/geoserver/safemap/wms?LAYERS=A2SM_CRMNLHSPOT_F1_TOT&amp;STYLES=A2SM_OdblrCrmnlHspot_Tot_20_24&amp;FORMAT=image%2Fpng&amp;EXCEPTIONS=text%2Fxml&amp;TRANSPARENT=TRUE&amp;SERVICE=WMS&amp;VERSION=1.1.1&amp;REQUEST=GetMap&amp;SRS=EPSG%3A900913&amp;BBOX=14140238.733198,4523849.0804195,14140850.229425,4524460.5766457&amp;WIDTH=256&amp;HEIGHT=256"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: 46px; top: 146px; width: 256px; height: 256px;" src="https://geo.safemap.go.kr/geoserver/safemap/wms?LAYERS=A2SM_CRMNLHSPOT_F1_TOT&amp;STYLES=A2SM_OdblrCrmnlHspot_Tot_20_24&amp;FORMAT=image%2Fpng&amp;EXCEPTIONS=text%2Fxml&amp;TRANSPARENT=TRUE&amp;SERVICE=WMS&amp;VERSION=1.1.1&amp;REQUEST=GetMap&amp;SRS=EPSG%3A900913&amp;BBOX=14139015.740746,4524460.5766457,14139627.236972,4525072.0728719&amp;WIDTH=256&amp;HEIGHT=256"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: 558px; top: 146px; width: 256px; height: 256px;" src="https://geo.safemap.go.kr/geoserver/safemap/wms?LAYERS=A2SM_CRMNLHSPOT_F1_TOT&amp;STYLES=A2SM_OdblrCrmnlHspot_Tot_20_24&amp;FORMAT=image%2Fpng&amp;EXCEPTIONS=text%2Fxml&amp;TRANSPARENT=TRUE&amp;SERVICE=WMS&amp;VERSION=1.1.1&amp;REQUEST=GetMap&amp;SRS=EPSG%3A900913&amp;BBOX=14140238.733198,4524460.5766457,14140850.229425,4525072.0728719&amp;WIDTH=256&amp;HEIGHT=256"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: 302px; top: 658px; width: 256px; height: 256px;" src="https://geo.safemap.go.kr/geoserver/safemap/wms?LAYERS=A2SM_CRMNLHSPOT_F1_TOT&amp;STYLES=A2SM_OdblrCrmnlHspot_Tot_20_24&amp;FORMAT=image%2Fpng&amp;EXCEPTIONS=text%2Fxml&amp;TRANSPARENT=TRUE&amp;SERVICE=WMS&amp;VERSION=1.1.1&amp;REQUEST=GetMap&amp;SRS=EPSG%3A900913&amp;BBOX=14139627.236972,4523237.5841934,14140238.733198,4523849.0804195&amp;WIDTH=256&amp;HEIGHT=256"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: 46px; top: 658px; width: 256px; height: 256px;" src="https://geo.safemap.go.kr/geoserver/safemap/wms?LAYERS=A2SM_CRMNLHSPOT_F1_TOT&amp;STYLES=A2SM_OdblrCrmnlHspot_Tot_20_24&amp;FORMAT=image%2Fpng&amp;EXCEPTIONS=text%2Fxml&amp;TRANSPARENT=TRUE&amp;SERVICE=WMS&amp;VERSION=1.1.1&amp;REQUEST=GetMap&amp;SRS=EPSG%3A900913&amp;BBOX=14139015.740746,4523237.5841934,14139627.236972,4523849.0804195&amp;WIDTH=256&amp;HEIGHT=256"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: 302px; top: -110px; width: 256px; height: 256px;" src="https://geo.safemap.go.kr/geoserver/safemap/wms?LAYERS=A2SM_CRMNLHSPOT_F1_TOT&amp;STYLES=A2SM_OdblrCrmnlHspot_Tot_20_24&amp;FORMAT=image%2Fpng&amp;EXCEPTIONS=text%2Fxml&amp;TRANSPARENT=TRUE&amp;SERVICE=WMS&amp;VERSION=1.1.1&amp;REQUEST=GetMap&amp;SRS=EPSG%3A900913&amp;BBOX=14139627.236972,4525072.0728719,14140238.733198,4525683.569098&amp;WIDTH=256&amp;HEIGHT=256"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: 558px; top: 658px; width: 256px; height: 256px;" src="https://geo.safemap.go.kr/geoserver/safemap/wms?LAYERS=A2SM_CRMNLHSPOT_F1_TOT&amp;STYLES=A2SM_OdblrCrmnlHspot_Tot_20_24&amp;FORMAT=image%2Fpng&amp;EXCEPTIONS=text%2Fxml&amp;TRANSPARENT=TRUE&amp;SERVICE=WMS&amp;VERSION=1.1.1&amp;REQUEST=GetMap&amp;SRS=EPSG%3A900913&amp;BBOX=14140238.733198,4523237.5841934,14140850.229425,4523849.0804195&amp;WIDTH=256&amp;HEIGHT=256"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: 46px; top: -110px; width: 256px; height: 256px;" src="https://geo.safemap.go.kr/geoserver/safemap/wms?LAYERS=A2SM_CRMNLHSPOT_F1_TOT&amp;STYLES=A2SM_OdblrCrmnlHspot_Tot_20_24&amp;FORMAT=image%2Fpng&amp;EXCEPTIONS=text%2Fxml&amp;TRANSPARENT=TRUE&amp;SERVICE=WMS&amp;VERSION=1.1.1&amp;REQUEST=GetMap&amp;SRS=EPSG%3A900913&amp;BBOX=14139015.740746,4525072.0728719,14139627.236972,4525683.569098&amp;WIDTH=256&amp;HEIGHT=256"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: -210px; top: 402px; width: 256px; height: 256px;" src="https://geo.safemap.go.kr/geoserver/safemap/wms?LAYERS=A2SM_CRMNLHSPOT_F1_TOT&amp;STYLES=A2SM_OdblrCrmnlHspot_Tot_20_24&amp;FORMAT=image%2Fpng&amp;EXCEPTIONS=text%2Fxml&amp;TRANSPARENT=TRUE&amp;SERVICE=WMS&amp;VERSION=1.1.1&amp;REQUEST=GetMap&amp;SRS=EPSG%3A900913&amp;BBOX=14138404.24452,4523849.0804195,14139015.740746,4524460.5766457&amp;WIDTH=256&amp;HEIGHT=256"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: 558px; top: -110px; width: 256px; height: 256px;" src="https://geo.safemap.go.kr/geoserver/safemap/wms?LAYERS=A2SM_CRMNLHSPOT_F1_TOT&amp;STYLES=A2SM_OdblrCrmnlHspot_Tot_20_24&amp;FORMAT=image%2Fpng&amp;EXCEPTIONS=text%2Fxml&amp;TRANSPARENT=TRUE&amp;SERVICE=WMS&amp;VERSION=1.1.1&amp;REQUEST=GetMap&amp;SRS=EPSG%3A900913&amp;BBOX=14140238.733198,4525072.0728719,14140850.229425,4525683.569098&amp;WIDTH=256&amp;HEIGHT=256"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: -210px; top: 146px; width: 256px; height: 256px;" src="https://geo.safemap.go.kr/geoserver/safemap/wms?LAYERS=A2SM_CRMNLHSPOT_F1_TOT&amp;STYLES=A2SM_OdblrCrmnlHspot_Tot_20_24&amp;FORMAT=image%2Fpng&amp;EXCEPTIONS=text%2Fxml&amp;TRANSPARENT=TRUE&amp;SERVICE=WMS&amp;VERSION=1.1.1&amp;REQUEST=GetMap&amp;SRS=EPSG%3A900913&amp;BBOX=14138404.24452,4524460.5766457,14139015.740746,4525072.0728719&amp;WIDTH=256&amp;HEIGHT=256"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: 814px; top: 402px; width: 256px; height: 256px;" src="https://geo.safemap.go.kr/geoserver/safemap/wms?LAYERS=A2SM_CRMNLHSPOT_F1_TOT&amp;STYLES=A2SM_OdblrCrmnlHspot_Tot_20_24&amp;FORMAT=image%2Fpng&amp;EXCEPTIONS=text%2Fxml&amp;TRANSPARENT=TRUE&amp;SERVICE=WMS&amp;VERSION=1.1.1&amp;REQUEST=GetMap&amp;SRS=EPSG%3A900913&amp;BBOX=14140850.229425,4523849.0804195,14141461.725651,4524460.5766457&amp;WIDTH=256&amp;HEIGHT=256"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: 814px; top: 146px; width: 256px; height: 256px;" src="https://geo.safemap.go.kr/geoserver/safemap/wms?LAYERS=A2SM_CRMNLHSPOT_F1_TOT&amp;STYLES=A2SM_OdblrCrmnlHspot_Tot_20_24&amp;FORMAT=image%2Fpng&amp;EXCEPTIONS=text%2Fxml&amp;TRANSPARENT=TRUE&amp;SERVICE=WMS&amp;VERSION=1.1.1&amp;REQUEST=GetMap&amp;SRS=EPSG%3A900913&amp;BBOX=14140850.229425,4524460.5766457,14141461.725651,4525072.0728719&amp;WIDTH=256&amp;HEIGHT=256"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: 302px; top: 914px; width: 256px; height: 256px;" src="https://geo.safemap.go.kr/geoserver/safemap/wms?LAYERS=A2SM_CRMNLHSPOT_F1_TOT&amp;STYLES=A2SM_OdblrCrmnlHspot_Tot_20_24&amp;FORMAT=image%2Fpng&amp;EXCEPTIONS=text%2Fxml&amp;TRANSPARENT=TRUE&amp;SERVICE=WMS&amp;VERSION=1.1.1&amp;REQUEST=GetMap&amp;SRS=EPSG%3A900913&amp;BBOX=14139627.236972,4522626.0879672,14140238.733198,4523237.5841934&amp;WIDTH=256&amp;HEIGHT=256"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: -210px; top: 658px; width: 256px; height: 256px;" src="https://geo.safemap.go.kr/geoserver/safemap/wms?LAYERS=A2SM_CRMNLHSPOT_F1_TOT&amp;STYLES=A2SM_OdblrCrmnlHspot_Tot_20_24&amp;FORMAT=image%2Fpng&amp;EXCEPTIONS=text%2Fxml&amp;TRANSPARENT=TRUE&amp;SERVICE=WMS&amp;VERSION=1.1.1&amp;REQUEST=GetMap&amp;SRS=EPSG%3A900913&amp;BBOX=14138404.24452,4523237.5841934,14139015.740746,4523849.0804195&amp;WIDTH=256&amp;HEIGHT=256"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: 814px; top: 658px; width: 256px; height: 256px;" src="https://geo.safemap.go.kr/geoserver/safemap/wms?LAYERS=A2SM_CRMNLHSPOT_F1_TOT&amp;STYLES=A2SM_OdblrCrmnlHspot_Tot_20_24&amp;FORMAT=image%2Fpng&amp;EXCEPTIONS=text%2Fxml&amp;TRANSPARENT=TRUE&amp;SERVICE=WMS&amp;VERSION=1.1.1&amp;REQUEST=GetMap&amp;SRS=EPSG%3A900913&amp;BBOX=14140850.229425,4523237.5841934,14141461.725651,4523849.0804195&amp;WIDTH=256&amp;HEIGHT=256"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: 46px; top: 914px; width: 256px; height: 256px;" src="https://geo.safemap.go.kr/geoserver/safemap/wms?LAYERS=A2SM_CRMNLHSPOT_F1_TOT&amp;STYLES=A2SM_OdblrCrmnlHspot_Tot_20_24&amp;FORMAT=image%2Fpng&amp;EXCEPTIONS=text%2Fxml&amp;TRANSPARENT=TRUE&amp;SERVICE=WMS&amp;VERSION=1.1.1&amp;REQUEST=GetMap&amp;SRS=EPSG%3A900913&amp;BBOX=14139015.740746,4522626.0879672,14139627.236972,4523237.5841934&amp;WIDTH=256&amp;HEIGHT=256"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: -210px; top: -110px; width: 256px; height: 256px;" src="https://geo.safemap.go.kr/geoserver/safemap/wms?LAYERS=A2SM_CRMNLHSPOT_F1_TOT&amp;STYLES=A2SM_OdblrCrmnlHspot_Tot_20_24&amp;FORMAT=image%2Fpng&amp;EXCEPTIONS=text%2Fxml&amp;TRANSPARENT=TRUE&amp;SERVICE=WMS&amp;VERSION=1.1.1&amp;REQUEST=GetMap&amp;SRS=EPSG%3A900913&amp;BBOX=14138404.24452,4525072.0728719,14139015.740746,4525683.569098&amp;WIDTH=256&amp;HEIGHT=256"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: 558px; top: 914px; width: 256px; height: 256px;" src="https://geo.safemap.go.kr/geoserver/safemap/wms?LAYERS=A2SM_CRMNLHSPOT_F1_TOT&amp;STYLES=A2SM_OdblrCrmnlHspot_Tot_20_24&amp;FORMAT=image%2Fpng&amp;EXCEPTIONS=text%2Fxml&amp;TRANSPARENT=TRUE&amp;SERVICE=WMS&amp;VERSION=1.1.1&amp;REQUEST=GetMap&amp;SRS=EPSG%3A900913&amp;BBOX=14140238.733198,4522626.0879672,14140850.229425,4523237.5841934&amp;WIDTH=256&amp;HEIGHT=256"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: 814px; top: -110px; width: 256px; height: 256px;" src="https://geo.safemap.go.kr/geoserver/safemap/wms?LAYERS=A2SM_CRMNLHSPOT_F1_TOT&amp;STYLES=A2SM_OdblrCrmnlHspot_Tot_20_24&amp;FORMAT=image%2Fpng&amp;EXCEPTIONS=text%2Fxml&amp;TRANSPARENT=TRUE&amp;SERVICE=WMS&amp;VERSION=1.1.1&amp;REQUEST=GetMap&amp;SRS=EPSG%3A900913&amp;BBOX=14140850.229425,4525072.0728719,14141461.725651,4525683.569098&amp;WIDTH=256&amp;HEIGHT=256"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: -210px; top: 914px; width: 256px; height: 256px;" src="https://geo.safemap.go.kr/geoserver/safemap/wms?LAYERS=A2SM_CRMNLHSPOT_F1_TOT&amp;STYLES=A2SM_OdblrCrmnlHspot_Tot_20_24&amp;FORMAT=image%2Fpng&amp;EXCEPTIONS=text%2Fxml&amp;TRANSPARENT=TRUE&amp;SERVICE=WMS&amp;VERSION=1.1.1&amp;REQUEST=GetMap&amp;SRS=EPSG%3A900913&amp;BBOX=14138404.24452,4522626.0879672,14139015.740746,4523237.5841934&amp;WIDTH=256&amp;HEIGHT=256"><img class="olTileImage" style="visibility: inherit; opacity: 1; position: absolute; left: 814px; top: 914px; width: 256px; height: 256px;" src="https://geo.safemap.go.kr/geoserver/safemap/wms?LAYERS=A2SM_CRMNLHSPOT_F1_TOT&amp;STYLES=A2SM_OdblrCrmnlHspot_Tot_20_24&amp;FORMAT=image%2Fpng&amp;EXCEPTIONS=text%2Fxml&amp;TRANSPARENT=TRUE&amp;SERVICE=WMS&amp;VERSION=1.1.1&amp;REQUEST=GetMap&amp;SRS=EPSG%3A900913&amp;BBOX=14140850.229425,4522626.0879672,14141461.725651,4523237.5841934&amp;WIDTH=256&amp;HEIGHT=256"></div></div><div id="vworld_WaterMark_6" class="vworldWaterMark olControlNoSelect" unselectable="on" style="position: absolute; left: 10px; bottom: 6px; z-index: 1001; color: rgb(17, 17, 17);"><img src="https://map.vworld.kr/images/maps/logo_openplatform_simple.png"></div><div id="OpenLayers_Control_LayerSwitcher_7" class="olControlLayerSwitcher olControlNoSelect" unselectable="on" style="position: absolute; z-index: 1002;"><div id="OpenLayers_Control_LayerSwitcher_7_layersDiv" class="layersDiv" style=""><div class="baseLbl">Base Layer</div><div class="baseLayersDiv"><input id="OpenLayers_Control_LayerSwitcher_7_input_204" name="OpenLayers_Control_LayerSwitcher_7_baseLayers" type="radio" value="VBASE" checked="" class="olButton"><label class="labelSpan olButton" style="vertical-align: bottom;">VBASE</label><br></div><div class="dataLbl" style="">Overlays</div><div class="dataLayersDiv"><input id="OpenLayers_Control_LayerSwitcher_7_input_205" name="여성밤길치안안전 - 전체" type="checkbox" value="여성밤길치안안전 - 전체" checked="" class="olButton"><label class="labelSpan olButton" style="vertical-align: baseline;">여성밤길치안안전 - 전체</label><br></div></div><div id="OpenLayers_Control_MaximizeDiv" class="maximizeDiv olButton" style="position: absolute; display: none;"><img id="OpenLayers_Control_MaximizeDiv_innerImage" class="olAlphaImg" src="https://cdnjs.cloudflare.com/ajax/libs/openlayers/2.13.1/img/layer-switcher-maximize.png" style="position: relative;"></div><div id="OpenLayers_Control_MinimizeDiv" class="minimizeDiv olButton" style="position: absolute;"><img id="OpenLayers_Control_MinimizeDiv_innerImage" class="olAlphaImg" src="https://cdnjs.cloudflare.com/ajax/libs/openlayers/2.13.1/img/layer-switcher-minimize.png" style="position: relative;"></div></div><div id="OpenLayers_Control_PanZoomBar_93" class="olControlPanZoomBar olControlNoSelect" unselectable="on" style="position: absolute; left: 4px; top: 4px; z-index: 1003;"><div id="OpenLayers_Control_PanZoomBar_93_panup" class="olButton" style="position: absolute; left: 13px; top: 4px; width: 18px; height: 18px; cursor: pointer;"><img id="OpenLayers_Control_PanZoomBar_93_panup_innerImage" class="olAlphaImg" src="https://cdnjs.cloudflare.com/ajax/libs/openlayers/2.13.1/img/north-mini.png" style="position: relative; width: 18px; height: 18px;"></div><div id="OpenLayers_Control_PanZoomBar_93_panleft" class="olButton" style="position: absolute; left: 4px; top: 22px; width: 18px; height: 18px; cursor: pointer;"><img id="OpenLayers_Control_PanZoomBar_93_panleft_innerImage" class="olAlphaImg" src="https://cdnjs.cloudflare.com/ajax/libs/openlayers/2.13.1/img/west-mini.png" style="position: relative; width: 18px; height: 18px;"></div><div id="OpenLayers_Control_PanZoomBar_93_panright" class="olButton" style="position: absolute; left: 22px; top: 22px; width: 18px; height: 18px; cursor: pointer;"><img id="OpenLayers_Control_PanZoomBar_93_panright_innerImage" class="olAlphaImg" src="https://cdnjs.cloudflare.com/ajax/libs/openlayers/2.13.1/img/east-mini.png" style="position: relative; width: 18px; height: 18px;"></div><div id="OpenLayers_Control_PanZoomBar_93_pandown" class="olButton" style="position: absolute; left: 13px; top: 40px; width: 18px; height: 18px; cursor: pointer;"><img id="OpenLayers_Control_PanZoomBar_93_pandown_innerImage" class="olAlphaImg" src="https://cdnjs.cloudflare.com/ajax/libs/openlayers/2.13.1/img/south-mini.png" style="position: relative; width: 18px; height: 18px;"></div><div id="OpenLayers_Control_PanZoomBar_93_zoomin" class="olButton" style="position: absolute; left: 13px; top: 63px; width: 18px; height: 18px; cursor: pointer;"><img id="OpenLayers_Control_PanZoomBar_93_zoomin_innerImage" class="olAlphaImg" src="https://cdnjs.cloudflare.com/ajax/libs/openlayers/2.13.1/img/zoom-plus-mini.png" style="position: relative; width: 18px; height: 18px;"></div><div id="OpenLayers_Control_PanZoomBar_ZoombarOpenLayers_Map_2" class="olButton" style="background-image: url(&quot;https://cdnjs.cloudflare.com/ajax/libs/openlayers/2.13.1/img/zoombar.png&quot;); left: 13px; top: 81px; width: 18px; height: 209px; position: absolute; cursor: pointer;"></div><div id="OpenLayers_Control_PanZoomBar_93_OpenLayers_Map_2" style="position: absolute; left: 12px; top: 126px; width: 20px; height: 9px; cursor: move;"><img id="OpenLayers_Control_PanZoomBar_93_OpenLayers_Map_2_innerImage" class="olAlphaImg" src="https://cdnjs.cloudflare.com/ajax/libs/openlayers/2.13.1/img/slider.png" style="position: relative; width: 20px; height: 9px;"></div><div id="OpenLayers_Control_PanZoomBar_93_zoomout" class="olButton" style="position: absolute; left: 13px; top: 290px; width: 18px; height: 18px; cursor: pointer;"><img id="OpenLayers_Control_PanZoomBar_93_zoomout_innerImage" class="olAlphaImg" src="https://cdnjs.cloudflare.com/ajax/libs/openlayers/2.13.1/img/zoom-minus-mini.png" style="position: relative; width: 18px; height: 18px;"></div></div><div id="OpenLayers_Control_MousePosition_109" class="olControlMousePosition olControlNoSelect" unselectable="on" style="position: absolute; z-index: 1004;">127.02964, 37.60565</div><div id="OpenLayers_Control_Attribution_121" class="olControlAttribution olControlNoSelect" unselectable="on" style="position: absolute; z-index: 1006;">Data by <a href="https://map.vworld.kr/">VWORLD MAP</a></div></div></div>
+
+</body></html>
