@@ -12,7 +12,7 @@
         android:layout_height="match_parent" />
 
     <ImageButton
-        android:id="@+id/imageButton_setting"
+        android:id="@+id/settingsButton"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_alignParentEnd="true"
@@ -20,6 +20,8 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
+        android:contentDescription="@string/settings_description"
+        android:background="@android:color/transparent"
         android:scaleType="centerInside"
         android:background="@android:color/transparent"
         android:src="@drawable/settings"
@@ -27,7 +29,7 @@
         tools:visibility="visible" />
 
     <ImageButton
-        android:id="@+id/imageButton_loud_speaker"
+        android:id="@+id/informationButton"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_alignParentEnd="true"
@@ -41,6 +43,7 @@
         android:visibility="visible"
         tools:visibility="visible" />
 
+    <!--android:background="@drawable/image_with_border" -->
     <ImageButton
         android:id="@+id/imageButton_talk"
         android:layout_width="40dp"
@@ -56,6 +59,7 @@
         tools:srcCompat="@drawable/talk"
         tools:visibility="visible" />
 
+    <!--android:background="@drawable/image_with_border" -->
     <ImageButton
         android:id="@+id/imageButton_location"
         android:layout_width="wrap_content"
@@ -71,6 +75,7 @@
         tools:srcCompat="@drawable/location"
         tools:visibility="visible" />
 
+    <!--android:background="@drawable/image_with_border" -->
 </RelativeLayout>
 
     <!--android:background="@android:color/transparent" 사용하여 webview와 조화롭게 버튼 올려놓았습니다-->
