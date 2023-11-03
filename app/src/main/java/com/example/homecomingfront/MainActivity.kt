@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity() {
         //webView.loadUrl("file:///android_asset/openlayers.html") // "file:///android_asset/openlayers.html" ?
 
 
-        //intent를 사용하여 설정 화면으러 전환하기
+        //intent를 사용하여 설정 화면으로 전환하기
         val settingsButton: ImageButton = findViewById(R.id.settingsButton)
         settingsButton.setOnClickListener {
             val intent = Intent(this@MainActivity, SettingsActivity::class.java)
