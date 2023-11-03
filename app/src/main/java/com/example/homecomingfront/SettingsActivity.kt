@@ -1,5 +1,6 @@
 package com.example.homecomingfront
 
+import android.util.Log
 import android.os.Bundle
 import android.view.View
 import android.view.MenuItem
@@ -31,6 +32,7 @@ class SettingsActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
     fun handleBackClick(view: View) {
+        Log.d("DEBUG", "ImageButton clicked!")
         finish()
     }
 
