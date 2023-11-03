@@ -61,8 +61,7 @@ function init(){
 
     map.zoomTo(14)
 
-	map.addControl(new OpenLayers.Control.PanZoomBar());
-	map.addControl(new OpenLayers.Control.MousePosition());
+	map.addControl(new OpenLayers.Control.PanZoomBar()); // 얘 지우면 줌 바랑 컨트롤 키 지울 수 있음.
 	map.addControl(new OpenLayers.Control.Navigation());
 	map.addControl(new OpenLayers.Control.Attribution({separator:" "}));
 	addWmsLayer();
@@ -89,6 +88,8 @@ function addWmsLayer(){
     </script>
     <style type="text/css">
         input.cfe-styled { display: none; } select.cfe-styled, input.cfe-styled[type=file] { position: relative; display: block; opacity: 0; -ms-filter:"progid:DXImageTransform.Microsoft.Alpha"(Opacity=0); filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0); filter:alpha(opacity=0); z-index: 5; }
+
+
     </style>
     <link rel="stylesheet" type="text/css"
           href="https://cdnjs.cloudflare.com/ajax/libs/openlayers/2.13.1/theme/default/style.css">
