@@ -13,7 +13,8 @@
         android:layout_alignParentStart="true"
         android:src="@drawable/ic_back"
         android:background="?android:selectableItemBackground"
-        android:onClick="handleBackClick" />/>
+        android:contentDescription="@string/back_button_description" />
+
 
     <!-- 설정 텍스트뷰 -->
     <TextView
@@ -22,7 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/backButton"
         android:layout_marginTop="16dp"
-        android:text="설정"
+        android:text="@string/settings"
         android:textSize="24sp" />
 
     <!-- 회원 가입 버튼 -->
@@ -33,7 +34,7 @@
         android:layout_below="@id/settingsText"
         android:layout_marginTop="16dp"
         android:background="@drawable/rounded_button"
-        android:text="회원 가입" />
+        android:text="@string/register" />
 
     <!-- 회원 탈퇴 버튼 -->
     <Button
@@ -43,7 +44,7 @@
         android:layout_below="@id/registerButton"
         android:layout_marginTop="8dp"
         android:background="@drawable/rounded_button"
-        android:text="회원 탈퇴" />
+        android:text="@string/unregister" />
 
     <!-- 보호자 등록 버튼 -->
     <Button
@@ -53,7 +54,7 @@
         android:layout_below="@id/unregisterButton"
         android:layout_marginTop="8dp"
         android:background="@drawable/rounded_button"
-        android:text="보호자 등록" />
+        android:text="@string/guardian_register" />
 
     <!-- 내 정보 수정 버튼 -->
     <Button
@@ -63,7 +64,7 @@
         android:layout_below="@id/guardianRegisterButton"
         android:layout_marginTop="8dp"
         android:background="@drawable/rounded_button"
-        android:text="내 정보 수정" />
+        android:text="@string/edit_profile" />
 
     <FrameLayout
         android:id="@+id/settings"
