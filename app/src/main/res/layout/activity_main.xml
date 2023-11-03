@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -20,11 +21,10 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         android:scaleType="centerInside"
-        android:background="@drawable/image_with_border"
+        android:background="@android:color/transparent"
         android:src="@drawable/settings"
         android:visibility="visible"
-        tools:visibility="visible"
-        android:contentDescription="@string/settings_description" />
+        tools:visibility="visible" />
 
     <ImageButton
         android:id="@+id/imageButton_loud_speaker"
@@ -35,44 +35,41 @@
         android:layout_marginTop="500dp"
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="16dp"
-        android:background="@drawable/image_with_border"
+        android:background="@android:color/transparent"
         android:scaleType="centerInside"
         android:src="@drawable/fxemoji_loudspeaker"
         android:visibility="visible"
-        tools:visibility="visible"
-        android:contentDescription="@string/loud_speaker_description" />
+        tools:visibility="visible" />
 
     <ImageButton
         android:id="@+id/imageButton_talk"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_alignParentEnd="true"
         android:layout_marginStart="16dp"
         android:layout_marginTop="570dp"
-        android:layout_marginEnd="10dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:background="@drawable/image_with_border"
+        android:background="@android:color/transparent"
         android:src="@drawable/talk"
         android:visibility="visible"
         tools:srcCompat="@drawable/talk"
-        tools:visibility="visible"
-        android:contentDescription="@string/talk_description" />
+        tools:visibility="visible" />
 
     <ImageButton
         android:id="@+id/imageButton_location"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="650dp"
-        android:layout_marginEnd="10dp"
+        android:layout_marginTop="630dp"
+        android:layout_marginEnd="20dp"
         android:layout_marginBottom="16dp"
-        android:background="@drawable/image_with_border"
+        android:background="@android:color/transparent"
         android:src="@drawable/location"
         android:visibility="visible"
         tools:srcCompat="@drawable/location"
-        tools:visibility="visible"
-        android:contentDescription="@string/location_description" />
+        tools:visibility="visible" />
 
 </RelativeLayout>
 
