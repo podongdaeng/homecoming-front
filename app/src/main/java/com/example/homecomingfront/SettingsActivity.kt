@@ -1,5 +1,5 @@
 package com.example.homecomingfront
-
+/////////
 import android.util.Log
 import android.os.Bundle
 import android.view.View
