@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">homecomingfront</string>
+    <string name="settings_description">Settings</string>
+    <string name="loud_speaker_description">Loud speaker</string>
+    <string name="talk_description">Talk</string>
+    <string name="location_description">Location</string>
 </resources>
