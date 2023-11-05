@@ -68,6 +68,16 @@
         android:background="@drawable/rounded_button"
         android:text="@string/edit_profile" />
 
+    <!-- 로그인 버튼 -->
+    <Button
+        android:id="@+id/LoginButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/editProfileButton"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/rounded_button"
+        android:text="@string/Login" />
+
     <FrameLayout
         android:id="@+id/settings"
         android:layout_width="match_parent"

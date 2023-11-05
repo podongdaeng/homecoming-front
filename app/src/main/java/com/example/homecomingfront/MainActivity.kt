@@ -21,7 +21,7 @@ class MainActivity : AppCompatActivity() {
 //        webSettings.allowFileAccess = true
 
         // Load the OpenLayers map in the WebView
-        //webView.loadUrl("file:///android_asset/openlayers.html") // "file:///android_asset/openlayers.html" ?
+        webView.loadUrl("file:///android_asset/openlayers.html") // "file:///android_asset/openlayers.html" ?
 
 
         //intent를 사용하여 설정 화면으로 전환하기
