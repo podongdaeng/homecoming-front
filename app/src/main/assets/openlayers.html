@@ -84,6 +84,33 @@ function addWmsLayer(){
 	$('#basemap').height($(window).height()-20);
 }
 
+function addLocationIcon(lat, lng) {
+    var lonLat = new OpenLayers.LonLat(lng, lat).transform(
+        new OpenLayers.Projection("EPSG:4326"),
+        map.getProjectionObject()
+    );
+
+    var feature = new OpenLayers.Feature.Vector(
+        new OpenLayers.Geometry.Point(lonLat.lon, lonLat.lat),
+        {},
+        {
+            externalGraphic: 'file:///android_asset/mdi_location.png', // path of icon
+            graphicHeight: 50,
+            graphicWidth: 50,
+            graphicXOffset: -12,
+            graphicYOffset: -25
+        }
+    );
+
+    var vectorLayer = new OpenLayers.Layer.Vector("Icon Layer");
+    vectorLayer.addFeatures([feature]);
+    map.addLayer(vectorLayer);
+
+    map.setCenter(lonLat, 14); // Or any other zoom level
+}
+
+
+
 
     </script>
     <style type="text/css">

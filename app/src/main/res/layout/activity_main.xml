@@ -69,12 +69,13 @@
         android:layout_marginTop="650dp"
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="16dp"
-
+        android:background="@android:color/transparent"
         android:src="@drawable/location"
         android:visibility="visible"
         tools:srcCompat="@drawable/location"
         tools:visibility="visible"
         android:contentDescription="@string/location_description" />
+
 
     <!--android:background="@drawable/image_with_border" -->
 </RelativeLayout>
