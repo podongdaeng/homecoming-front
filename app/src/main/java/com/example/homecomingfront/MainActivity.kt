@@ -32,6 +32,8 @@ class MainActivity : AppCompatActivity() {
         // Load the local HTML file into the WebView
         webView.loadUrl("file:///android_asset/openlayers.html")
 
+        locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
         // Setup the settings button
         val settingsButton: ImageButton = findViewById(R.id.settingsButton)
         settingsButton.setOnClickListener {
@@ -42,14 +44,14 @@ class MainActivity : AppCompatActivity() {
         // Setup the location button
         val locationButton: ImageButton = findViewById(R.id.imageButton_location)
         locationButton.setOnClickListener {
-            requestLocationPermission()
+            requestLocationPermissionOrObtaionLocationIfGranted()
+            obtainSpecificGpsAndLoadInWebView()
+//            println(webView.zoomIn()) // TODO: zoomIn() = false. 줌 변경이 여기선 안되나?
         }
-
-        locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
     }
 
     // Request location permission
-    private fun requestLocationPermission() {
+    private fun requestLocationPermissionOrObtaionLocationIfGranted() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
         } else {
@@ -78,11 +80,32 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun obtainSpecificGpsAndLoadInWebView() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0f, testLocationListener)
+        } else {
+            Toast.makeText(this, "Location permission not granted", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     // Define a location listener
     private val locationListener = object : LocationListener {
         override fun onLocationChanged(location: Location) {
             val lat = location.latitude
             val lng = location.longitude
+            webView.loadUrl("javascript:addLocationIcon($lat, $lng)")
+            locationManager.removeUpdates(this) // If you only need one update - TODO: 얘는 본인위치니까 계속 업데이트해야해서 필요가 없을 수 있어요
+        }
+
+        override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
+        override fun onProviderEnabled(provider: String) {}
+        override fun onProviderDisabled(provider: String) {}
+    }
+
+    private val testLocationListener = object : LocationListener {
+        override fun onLocationChanged(location: Location) {
+            val lat = 37.5609
+            val lng = 126.9460
             webView.loadUrl("javascript:addLocationIcon($lat, $lng)")
             locationManager.removeUpdates(this) // If you only need one update
         }
@@ -96,5 +119,6 @@ class MainActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         locationManager.removeUpdates(locationListener)
+        locationManager.removeUpdates(testLocationListener)
     }
 }

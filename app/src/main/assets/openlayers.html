@@ -59,7 +59,7 @@ function init(){
 	map.zoomToExtent( mapBounds.transform(map.displayProjection, map.projection ) );
 	map.panTo(new OpenLayers.LonLat(14140009.710048,4524707.4183749));
 
-    map.zoomTo(14)
+    map.zoomTo(16)
 
 	map.addControl(new OpenLayers.Control.PanZoomBar()); // 얘 지우면 줌 바랑 컨트롤 키 지울 수 있음.
 	map.addControl(new OpenLayers.Control.Navigation());
@@ -107,6 +107,7 @@ function addLocationIcon(lat, lng) {
     map.addLayer(vectorLayer);
 
     map.setCenter(lonLat, 14); // Or any other zoom level
+    map.zoomTo(18)
 }
 
 
