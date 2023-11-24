@@ -28,37 +28,37 @@
         android:text="@string/settings"
         android:textSize="24sp" />
 
-    <!-- 회원 가입 버튼 -->
-    <Button
-        android:id="@+id/registerButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/settingsText"
-        android:layout_marginTop="16dp"
-        android:background="@drawable/rounded_button"
-        android:text="@string/register" />
-
-    <!-- 회원 탈퇴 버튼 -->
-    <Button
-        android:id="@+id/unregisterButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/registerButton"
-        android:layout_marginTop="8dp"
-        android:background="@drawable/rounded_button"
-        android:text="@string/unregister" />
-
     <!-- 보호자 등록 버튼 -->
     <Button
         android:id="@+id/guardianRegisterButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/unregisterButton"
-        android:layout_marginTop="8dp"
+        android:layout_below="@id/settingsText"
+        android:layout_marginTop="16dp"
         android:background="@drawable/rounded_button"
         android:text="@string/guardian_register" />
 
-    <!-- 내 정보 수정 버튼 -->
+    <Button
+        android:id="@+id/guardianModifyButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/guardianRegisterButton"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/rounded_button"
+        android:text="@string/guardian_modify" />
+
+
+    <Button
+        android:id="@+id/threatAlarmButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/guardianModifyButton"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/rounded_button"
+        android:text="@string/thread_alarm" />
+
+    <!--
+
     <Button
         android:id="@+id/editProfileButton"
         android:layout_width="match_parent"
@@ -68,7 +68,7 @@
         android:background="@drawable/rounded_button"
         android:text="@string/edit_profile" />
 
-    <!-- 로그인 버튼 -->
+
     <Button
         android:id="@+id/LoginButton"
         android:layout_width="match_parent"
@@ -77,6 +77,7 @@
         android:layout_marginTop="8dp"
         android:background="@drawable/rounded_button"
         android:text="@string/Login" />
+    -->
 
     <FrameLayout
         android:id="@+id/settings"

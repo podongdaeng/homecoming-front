@@ -8,7 +8,7 @@ import android.view.MenuItem
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceFragmentCompat
-import com.example.homecomingfront.ui.login.LoginActivity
+
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -24,11 +24,6 @@ class SettingsActivity : AppCompatActivity() {
 
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        val registerButton: Button = findViewById(R.id.registerButton)
-        registerButton.setOnClickListener {
-            val intent = Intent(this, LoginActivity::class.java)
-            startActivity(intent)
-        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
