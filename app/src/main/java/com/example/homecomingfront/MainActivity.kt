@@ -62,6 +62,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 val lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
                 if (lastKnownLocation != null) {
                     fetchAndDisplayLocationData(lastKnownLocation.latitude, lastKnownLocation.longitude) // 좌표 보내주고, 받아오고
+                    fetchAndDisplayLocationData_terror(lastKnownLocation.latitude, lastKnownLocation.longitude)
                     addLocationToMap(lastKnownLocation.latitude, lastKnownLocation.longitude) //
                     locationManager.removeUpdates(locationListener) // Stop updates after sending the location
                 } else {
@@ -184,9 +185,18 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         ): Call<List<LocationData>>
     }
 
+    interface ApiService_terror {
+        @GET("/near-threat") // Assuming you have the correct endpoint here
+        fun getLocationData_terror(
+            @Query("gps_lati") gps_Lati: Double,
+            @Query("gps_long") gps_Long: Double
+        ): Call<List<LocationData>>
+    }
+
     // Retrofit Client Object
     object RetrofitClient {
         private const val BASE_URL = "http://10.0.2.2:8080/"
+        private const val BASE_URL_terror = "http://10.0.2.2:8080/"
 
         val instance: ApiService by lazy {
             val retrofit = Retrofit.Builder()
@@ -195,6 +205,15 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 .build()
 
             retrofit.create(ApiService::class.java)
+        }
+
+        val instance_terror: ApiService_terror by lazy {
+            val retrofit = Retrofit.Builder()
+                .baseUrl(BASE_URL_terror)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+
+            retrofit.create(ApiService_terror::class.java)
         }
     }
 
@@ -206,7 +225,28 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 override fun onResponse(call: Call<List<LocationData>>, response: Response<List<LocationData>>) {
                     if (response.isSuccessful) {
                         response.body()?.forEach { locationData ->
-                            addLocationToMap(locationData.latitude, locationData.longitude)
+                            addBusToMap(locationData.latitude, locationData.longitude)
+                        }
+                    } else {
+                        Toast.makeText(this@MainActivity, "Error fetching data", Toast.LENGTH_SHORT).show()
+                        //Log.e("API Error", "Response Code: " + response.code() + " - " + response.errorBody()?.string())
+                    }
+                }
+
+                override fun onFailure(call: Call<List<LocationData>>, t: Throwable) {
+                    Toast.makeText(this@MainActivity, "Failed to connect to server", Toast.LENGTH_SHORT).show()
+                }
+            })
+    }
+
+    private fun fetchAndDisplayLocationData_terror(lat: Double, lng: Double) {
+
+        RetrofitClient.instance_terror.getLocationData_terror(lat, lng)
+            .enqueue(object : Callback<List<LocationData>> {
+                override fun onResponse(call: Call<List<LocationData>>, response: Response<List<LocationData>>) {
+                    if (response.isSuccessful) {
+                        response.body()?.forEach { locationData ->
+                            addTerrorToMap(locationData.latitude, locationData.longitude)
                         }
                     } else {
                         Toast.makeText(this@MainActivity, "Error fetching data", Toast.LENGTH_SHORT).show()
@@ -223,6 +263,13 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     // Add location to map
     private fun addLocationToMap(lat: Double, lng: Double) {
         webView.loadUrl("javascript:addLocationIcon($lat, $lng)")
+    }
+
+    private fun addBusToMap(lat: Double, lng: Double) {
+        webView.loadUrl("javascript:addIcon_bus($lat, $lng)")
+    }
+    private fun addTerrorToMap(lat: Double, lng: Double) {
+        webView.loadUrl("javascript:addIcon_terror($lat, $lng)")
     }
 
 
