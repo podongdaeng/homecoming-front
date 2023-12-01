@@ -1,14 +1,14 @@
 package com.example.homecomingfront
-
+import android.widget.Toast
+import androidx.appcompat.widget.SwitchCompat
 import android.content.Intent
-import android.util.Log
 import android.os.Bundle
-import android.view.View
 import android.view.MenuItem
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceFragmentCompat
-
+import android.content.Context
+import android.view.View
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -22,8 +22,34 @@ class SettingsActivity : AppCompatActivity() {
                 .commit()
         }
 
+        val threatAlarmSwitch: SwitchCompat = findViewById(R.id.threatAlarmSwitch) // 또는 SwitchMaterial
+        val sharedPref = getSharedPreferences("AppSettings", Context.MODE_PRIVATE)
+        threatAlarmSwitch.isChecked = sharedPref.getBoolean("ThreatAlarmEnabled", false)
+
+        threatAlarmSwitch.setOnCheckedChangeListener { _, isChecked ->
+            with(sharedPref.edit()) {
+                putBoolean("ThreatAlarmEnabled", isChecked)
+                apply()
+            }
+
+            if (isChecked) {
+                Toast.makeText(this, "위협 알림 활성화됨", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "위협 알림 비활성화됨", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        // 보호자 등록 버튼 설정
+        val guardianRegisterButton: Button = findViewById(R.id.guardianRegisterButton)
+        guardianRegisterButton.setOnClickListener {
+            // GaurdianRegisterActivity를 시작합니다.
+            val intent = Intent(this, GuardianRegisterActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

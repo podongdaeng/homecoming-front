@@ -21,14 +21,27 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
-import org.json.JSONObject
-import android.util.Log
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
+import android.telephony.SmsManager
+import android.view.View
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), SensorEventListener {
     private lateinit var webView: WebView
     private lateinit var locationManager: LocationManager
 
     private val LOCATION_PERMISSION_REQUEST_CODE = 1234
+
+
+    private lateinit var sensorManager: SensorManager
+    private var accelerometer: Sensor? = null
+    private var lastUpdate: Long = 0
+    private var last_x: Float = 0.0f
+    private var last_y: Float = 0.0f
+    private var last_z: Float = 0.0f
+    private val SHAKE_THRESHOLD = 800 // 흔들림 감지 임계값
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,7 +73,64 @@ class MainActivity : AppCompatActivity() {
         }
 
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
+        // 가속도 센서 리스너 설정
+        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL)
     }
+
+
+    override fun onSensorChanged(event: SensorEvent) {
+        val sensor = event.sensor
+        if (sensor.type == Sensor.TYPE_ACCELEROMETER) {
+            val x = event.values[0]
+            val y = event.values[1]
+            val z = event.values[2]
+
+            val currentTime = System.currentTimeMillis()
+            if ((currentTime - lastUpdate) > 100) {
+                val diffTime = currentTime - lastUpdate
+                lastUpdate = currentTime
+
+                val speed = Math.abs(x + y + z - last_x - last_y - last_z) / diffTime * 10000
+
+                if (speed > SHAKE_THRESHOLD) {
+                    // 흔들림 감지됨
+                    if (isThreatAlertEnabled()) {
+                        sendSmsMessage("I am in danger!")
+                    }
+                }
+
+                last_x = x
+                last_y = y
+                last_z = z
+            }
+        }
+    }
+
+    override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {
+        // 센서 정확도 변경 시 처리
+    }
+
+    private fun isThreatAlertEnabled(): Boolean {
+        val sharedPref = getSharedPreferences("AppSettings", Context.MODE_PRIVATE)
+        return sharedPref.getBoolean("ThreatAlarmEnabled", false)
+        // SharedPreferences 또는 다른 방법으로 설정 상태 확인
+        return true // 여기서는 예시로 항상 true를 반환
+    }
+
+    private fun sendSmsMessage(message: String) {
+        val sharedPref = getSharedPreferences("AppSettings", Context.MODE_PRIVATE)
+        val phoneNumber = sharedPref.getString("GuardianPhoneNumber", null)
+        phoneNumber?.let {
+            val smsManager = SmsManager.getDefault()
+            smsManager.sendTextMessage(phoneNumber, null, message, null, null)
+        }
+    }
+
+
+
 
     private fun requestLocationPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -104,10 +174,6 @@ class MainActivity : AppCompatActivity() {
         override fun onProviderDisabled(provider: String) {}
     }
 
-    override fun onPause() {
-        super.onPause()
-        locationManager.removeUpdates(locationListener)
-    }
 
     // Retrofit API interface
     interface ApiService {
@@ -166,4 +232,20 @@ class MainActivity : AppCompatActivity() {
         val latitude: Double,
         val longitude: Double
     )
+
+    override fun onResume() {
+        super.onResume()
+        if (isThreatAlertEnabled()) {
+            sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL)
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (isThreatAlertEnabled()) {
+            sensorManager.unregisterListener(this)
+        }
+        locationManager.removeUpdates(locationListener)
+    }
+
 }
