@@ -30,67 +30,58 @@
     <script>
 var map;
 var mapBounds = new OpenLayers.Bounds(123 , 32, 134 , 43);
-var mapMinZoom = 12;
-var mapMaxZoom = 21;
+var mapMinZoom = 7;
+var mapMaxZoom = 19;
 
 // avoid pink tiles
 OpenLayers.IMAGE_RELOAD_ATTEMPTS = 3;
 OpenLayers.Util.onImageLoadErrorColor = "transparent";
 
-function init() {
-    var options = {
-        //controls: [],
-        projection: new OpenLayers.Projection("EPSG:900913"),
-        displayProjection: new OpenLayers.Projection("EPSG:4326"),
-        units: "m",
-        numZoomLevels: 19, // 총 줌 레벨의 수
-        maxResolution: 156543.0339,
-        maxExtent: new OpenLayers.Bounds(-20037508.34, -20037508.34, 20037508.34, 20037508.34)
-    };
-    map = new OpenLayers.Map('basemap', options);
+function init(){
 
-    //======================================
-    //1. 배경지도 추가하기
-    vBase = new vworld.Layers.Base('VBASE');
-    if (vBase != null) {
-        map.addLayer(vBase);
-    }
+	var options = {
+	    controls: [],
+	    projection: new OpenLayers.Projection("EPSG:900913"),
+	    displayProjection: new OpenLayers.Projection("EPSG:4326"),
+	    units: "m",
+	    controls : [],
+	    numZoomLevels:21,
+	    maxResolution: 156543.0339,
+	    maxExtent: new OpenLayers.Bounds(-20037508.34, -20037508.34, 20037508.34, 20037508.34)
+	    };
+	map = new OpenLayers.Map('basemap', options);
 
-    map.zoomToExtent(mapBounds.transform(map.displayProjection, map.projection));
-    map.panTo(new OpenLayers.LonLat(14140009.710048, 4524707.4183749));
+	//======================================
+	//1. 배경지도 추가하기
+	vBase = new vworld.Layers.Base('VBASE');
+	if (vBase != null){map.addLayer(vBase);}
 
-    map.zoomTo(14); // 초기 줌 레벨 설정
-    map.events.register("zoomend", map, function() {
-        console.log("Zoom level changed. Current zoom level: " + map.getZoom());
-        var currentZoom = map.getZoom();
-        if (currentZoom < 10) {
-            setTimeout(function() { map.zoomTo(10); }, 100);
-        }
-    });
+	map.zoomToExtent( mapBounds.transform(map.displayProjection, map.projection ) );
+	map.panTo(new OpenLayers.LonLat(14140009.710048,4524707.4183749));
 
+    map.zoomTo(14)
 
-    map.addControl(new OpenLayers.Control.PanZoomBar());
-    map.addControl(new OpenLayers.Control.Navigation());
-    map.addControl(new OpenLayers.Control.Attribution({separator: " "}));
-    addWmsLayer();
+	map.addControl(new OpenLayers.Control.PanZoomBar()); // 얘 지우면 줌 바랑 컨트롤 키 지울 수 있음.
+	map.addControl(new OpenLayers.Control.Navigation());
+	map.addControl(new OpenLayers.Control.Attribution({separator:" "}));
+	addWmsLayer();
 }
 
-
 function addWmsLayer(){
-   param = {name:"여성밤길치안안전 - 전체",
-         serverUrl:"https://geo.safemap.go.kr/geoserver/safemap/wms",
-         layername:"A2SM_CRMNLHSPOT_F1_TOT",
-         styles:"A2SM_OdblrCrmnlHspot_Tot_20_24"};
-   var wmsLayer = new OpenLayers.Layer.WMS( param.name, param.serverUrl,
-                     {layers: ''+param.layername,
-                     styles:param.styles,
-                     format: 'image/png',
-                     exceptions:'text/xml',
-                     transparent: true},
-                     {isBaseLayer: false}
-                     );
-   map.addLayer(wmsLayer);
-   $('#basemap').height($(window).height()-20);
+	param = {name:"여성밤길치안안전 - 전체",
+			serverUrl:"https://geo.safemap.go.kr/geoserver/safemap/wms",
+			layername:"A2SM_CRMNLHSPOT_F1_TOT",
+			styles:"A2SM_OdblrCrmnlHspot_Tot_20_24"};
+	var wmsLayer = new OpenLayers.Layer.WMS( param.name, param.serverUrl,
+					      {layers: ''+param.layername,
+						   styles:param.styles,
+						   format: 'image/png',
+						   exceptions:'text/xml',
+						   transparent: true},
+					      {isBaseLayer: false}
+		               );
+	map.addLayer(wmsLayer);
+	$('#basemap').height($(window).height()-20);
 }
 
 function addLocationIcon(lat, lng) {
@@ -115,8 +106,7 @@ function addLocationIcon(lat, lng) {
     vectorLayer.addFeatures([feature]);
     map.addLayer(vectorLayer);
 
-    var currentZoomLevel = map.getZoom();
-    map.setCenter(lonLat, currentZoomLevel);
+    map.setCenter(lonLat, 14); // Or any other zoom level
 }
 
 

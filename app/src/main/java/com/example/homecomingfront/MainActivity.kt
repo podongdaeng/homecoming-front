@@ -21,6 +21,8 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
+import org.json.JSONObject
+import android.util.Log
 
 class MainActivity : AppCompatActivity() {
     private lateinit var webView: WebView
@@ -46,7 +48,8 @@ class MainActivity : AppCompatActivity() {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 val lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
                 if (lastKnownLocation != null) {
-                    fetchAndDisplayLocationData(lastKnownLocation.latitude, lastKnownLocation.longitude)
+                    fetchAndDisplayLocationData(lastKnownLocation.latitude, lastKnownLocation.longitude) // 좌표 보내주고, 받아오고
+                    addLocationToMap(lastKnownLocation.latitude, lastKnownLocation.longitude) //
                     locationManager.removeUpdates(locationListener) // Stop updates after sending the location
                 } else {
                     Toast.makeText(this, "No location detected", Toast.LENGTH_SHORT).show()
@@ -108,12 +111,10 @@ class MainActivity : AppCompatActivity() {
 
     // Retrofit API interface
     interface ApiService {
-        @GET("/front-test/2") // Assuming you have the correct endpoint here
+        @GET("/near-station") // Assuming you have the correct endpoint here
         fun getLocationData(
-            @Query("gps_lati_lower_left") latiLowerLeft: Double,
-            @Query("gps_lati_upper_right") latiUpperRight: Double,
-            @Query("gps_long_lower_left") longLowerLeft: Double,
-            @Query("gps_long_upper_right") longUpperRight: Double
+            @Query("gps_lati") gps_Lati: Double,
+            @Query("gps_long") gps_Long: Double
         ): Call<List<LocationData>>
     }
 
@@ -133,10 +134,8 @@ class MainActivity : AppCompatActivity() {
 
     // Fetch and display location data
     private fun fetchAndDisplayLocationData(lat: Double, lng: Double) {
-        val latiUpperRight = lat + 0.01 // Adjust the logic as needed
-        val longUpperRight = lng + 0.01 // Adjust the logic as needed
 
-        RetrofitClient.instance.getLocationData(lat, latiUpperRight, lng, longUpperRight)
+        RetrofitClient.instance.getLocationData(lat, lng)
             .enqueue(object : Callback<List<LocationData>> {
                 override fun onResponse(call: Call<List<LocationData>>, response: Response<List<LocationData>>) {
                     if (response.isSuccessful) {
@@ -145,6 +144,7 @@ class MainActivity : AppCompatActivity() {
                         }
                     } else {
                         Toast.makeText(this@MainActivity, "Error fetching data", Toast.LENGTH_SHORT).show()
+                        //Log.e("API Error", "Response Code: " + response.code() + " - " + response.errorBody()?.string())
                     }
                 }
 
@@ -159,8 +159,10 @@ class MainActivity : AppCompatActivity() {
         webView.loadUrl("javascript:addLocationIcon($lat, $lng)")
     }
 
+
     // Data model for location
     data class LocationData(
+        val name: String,
         val latitude: Double,
         val longitude: Double
     )

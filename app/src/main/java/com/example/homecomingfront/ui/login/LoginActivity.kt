@@ -1,4 +1,4 @@
-package com.example.homecomingfront.ui.login
+/*package com.example.homecomingfront.ui.login
 
 import android.app.Activity
 import androidx.lifecycle.Observer
@@ -231,3 +231,4 @@ class DateInputFilter : InputFilter {
         return null // Allow the change to go through
     }
 }
+*/
