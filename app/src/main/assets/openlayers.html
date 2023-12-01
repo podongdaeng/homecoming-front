@@ -33,6 +33,7 @@ var mapBounds = new OpenLayers.Bounds(123 , 32, 134 , 43);
 var mapMinZoom = 12;
 var mapMaxZoom = 21;
 
+
 // avoid pink tiles
 OpenLayers.IMAGE_RELOAD_ATTEMPTS = 3;
 OpenLayers.Util.onImageLoadErrorColor = "transparent";
@@ -93,7 +94,32 @@ function addWmsLayer(){
    $('#basemap').height($(window).height()-20);
 }
 
+var busLayer, terrorLayer, locationLayer;
+
+function clearLayers() {
+    if (busLayer) {
+        busLayer.removeAllFeatures();
+        map.removeLayer(busLayer);
+        busLayer.destroy();
+        busLayer = null;
+    }
+    if (terrorLayer) {
+        terrorLayer.removeAllFeatures();
+        map.removeLayer(terrorLayer);
+        terrorLayer.destroy();
+        terrorLayer = null;
+    }
+    if (locationLayer) {
+        locationLayer.removeAllFeatures();
+        map.removeLayer(locationLayer);
+        locationLayer.destroy();
+        locationLayer = null;
+    }
+}
+
 function addLocationIcon(lat, lng) {
+    clearLayers(); // Clear existing layers
+
     var lonLat = new OpenLayers.LonLat(lng, lat).transform(
         new OpenLayers.Projection("EPSG:4326"),
         map.getProjectionObject()
@@ -103,20 +129,65 @@ function addLocationIcon(lat, lng) {
         new OpenLayers.Geometry.Point(lonLat.lon, lonLat.lat),
         {},
         {
-            externalGraphic: 'file:///android_asset/mdi_location.png', // path of icon
+            externalGraphic: 'file:///android_asset/mdi_location.png',
             graphicHeight: 50,
             graphicWidth: 50,
-            graphicXOffset: -12,
-            graphicYOffset: -25
+            graphicXOffset: -25,
+            graphicYOffset: -50
         }
     );
 
-    var vectorLayer = new OpenLayers.Layer.Vector("Icon Layer");
-    vectorLayer.addFeatures([feature]);
-    map.addLayer(vectorLayer);
+    locationLayer = new OpenLayers.Layer.Vector("Location Icon Layer");
+    locationLayer.addFeatures([feature]);
+    map.addLayer(locationLayer);
 
-    var currentZoomLevel = map.getZoom();
-    map.setCenter(lonLat, currentZoomLevel);
+    map.setCenter(lonLat, map.getZoom());
+}
+
+function addIcon_bus(lat, lng) {
+    var lonLat = new OpenLayers.LonLat(lng, lat).transform(
+        new OpenLayers.Projection("EPSG:4326"),
+        map.getProjectionObject()
+    );
+
+    var feature = new OpenLayers.Feature.Vector(
+        new OpenLayers.Geometry.Point(lonLat.lon, lonLat.lat),
+        {},
+        {
+            externalGraphic: 'file:///android_asset/bus_stop.png',
+            graphicHeight: 40,
+            graphicWidth: 40,
+            graphicXOffset: -20,
+            graphicYOffset: -40
+        }
+    );
+
+    busLayer = new OpenLayers.Layer.Vector("Bus Icon Layer");
+    busLayer.addFeatures([feature]);
+    map.addLayer(busLayer);
+}
+
+function addIcon_terror(lat, lng) {
+    var lonLat = new OpenLayers.LonLat(lng, lat).transform(
+        new OpenLayers.Projection("EPSG:4326"),
+        map.getProjectionObject()
+    );
+
+    var feature = new OpenLayers.Feature.Vector(
+        new OpenLayers.Geometry.Point(lonLat.lon, lonLat.lat),
+        {},
+        {
+            externalGraphic: 'file:///android_asset/terror.png',
+            graphicHeight: 40,
+            graphicWidth: 40,
+            graphicXOffset: -20,
+            graphicYOffset: -40
+        }
+    );
+
+    terrorLayer = new OpenLayers.Layer.Vector("Terror Icon Layer");
+    terrorLayer.addFeatures([feature]);
+    map.addLayer(terrorLayer);
 }
 
 

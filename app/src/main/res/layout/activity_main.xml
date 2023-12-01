@@ -36,11 +36,11 @@
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="16dp"
         android:background="@android:color/transparent"
+        android:contentDescription="@string/loud_speaker_description"
         android:scaleType="centerInside"
         android:src="@drawable/fxemoji_loudspeaker"
         android:visibility="visible"
-        tools:visibility="visible"
-        android:contentDescription="@string/loud_speaker_description" />
+        tools:visibility="visible" />
 
     <!--android:background="@drawable/image_with_border" -->
     <ImageButton
