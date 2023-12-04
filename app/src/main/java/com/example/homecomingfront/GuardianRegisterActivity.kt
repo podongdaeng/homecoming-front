@@ -46,6 +46,12 @@ class GuardianRegisterActivity : AppCompatActivity() {
             startActivity(intent)
             finish()
         }
+        else if (result.resultCode == AppCompatActivity.RESULT_CANCELED) {
+            // 사용자가 뒤로가기 버튼을 누르거나 연락처 선택을 취소했을 때
+            Toast.makeText(this, "연락처 선택 취소됨", Toast.LENGTH_SHORT).show()
+            // 이 경우에는 현재 Activity를 종료하지 않음
+            finish()
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

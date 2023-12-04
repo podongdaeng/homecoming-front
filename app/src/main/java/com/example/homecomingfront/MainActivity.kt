@@ -26,6 +26,8 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.telephony.SmsManager
+import android.util.Log
+import org.json.JSONObject
 import android.view.View
 
 class MainActivity : AppCompatActivity(), SensorEventListener {
@@ -99,7 +101,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 if (speed > SHAKE_THRESHOLD) {
                     // 흔들림 감지됨
                     if (isThreatAlertEnabled()) {
-                        sendSmsMessage("I am in danger!")
+                        sendSmsMessage("피보호자 위협 알림!")
                     }
                 }
 

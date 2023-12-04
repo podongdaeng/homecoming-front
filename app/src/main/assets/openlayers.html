@@ -30,8 +30,8 @@
     <script>
 var map;
 var mapBounds = new OpenLayers.Bounds(123 , 32, 134 , 43);
-var mapMinZoom = 12;
-var mapMaxZoom = 21;
+//var mapMinZoom = 12;
+//var mapMaxZoom = 21;
 
 
 // avoid pink tiles
@@ -40,7 +40,7 @@ OpenLayers.Util.onImageLoadErrorColor = "transparent";
 
 function init() {
     var options = {
-        //controls: [],
+        controls: [],
         projection: new OpenLayers.Projection("EPSG:900913"),
         displayProjection: new OpenLayers.Projection("EPSG:4326"),
         units: "m",
@@ -60,7 +60,8 @@ function init() {
     map.zoomToExtent(mapBounds.transform(map.displayProjection, map.projection));
     map.panTo(new OpenLayers.LonLat(14140009.710048, 4524707.4183749));
 
-    map.zoomTo(14); // 초기 줌 레벨 설정
+   map.zoomTo(14); // 초기 줌 레벨 설정
+
     map.events.register("zoomend", map, function() {
         console.log("Zoom level changed. Current zoom level: " + map.getZoom());
         var currentZoom = map.getZoom();
@@ -70,9 +71,12 @@ function init() {
     });
 
 
+
+
     //map.addControl(new OpenLayers.Control.PanZoomBar());
-    //map.addControl(new OpenLayers.Control.Navigation());
-    //map.addControl(new OpenLayers.Control.Attribution({separator: " "}));
+    map.addControl(new OpenLayers.Control.Navigation());
+    map.addControl(new OpenLayers.Control.Attribution({separator: " "}));
+
     addWmsLayer();
 }
 
@@ -93,6 +97,7 @@ function addWmsLayer(){
    map.addLayer(wmsLayer);
    $('#basemap').height($(window).height()-20);
 }
+
 
 var busLayer, terrorLayer, locationLayer;
 
@@ -116,6 +121,7 @@ function clearLayers() {
         locationLayer = null;
     }
 }
+
 
 function addLocationIcon(lat, lng) {
     clearLayers(); // Clear existing layers
@@ -144,6 +150,7 @@ function addLocationIcon(lat, lng) {
     map.setCenter(lonLat, map.getZoom());
 }
 
+
 function addIcon_bus(lat, lng) {
     var lonLat = new OpenLayers.LonLat(lng, lat).transform(
         new OpenLayers.Projection("EPSG:4326"),
@@ -166,6 +173,7 @@ function addIcon_bus(lat, lng) {
     busLayer.addFeatures([feature]);
     map.addLayer(busLayer);
 }
+
 
 function addIcon_terror(lat, lng) {
     var lonLat = new OpenLayers.LonLat(lng, lat).transform(

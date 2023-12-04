@@ -27,7 +27,7 @@ class SettingsActivity : AppCompatActivity() {
         threatAlarmSwitch.isChecked = sharedPref.getBoolean("ThreatAlarmEnabled", false)
 
 
-        threatAlarmSwitch.setOnCheckedChangeListener { p0, isChecked ->
+        threatAlarmSwitch.setOnCheckedChangeListener { _, isChecked ->
             with(sharedPref.edit()) {
                 putBoolean("ThreatAlarmEnabled", isChecked)
                 apply()
@@ -51,6 +51,15 @@ class SettingsActivity : AppCompatActivity() {
             val intent = Intent(this, GuardianRegisterActivity::class.java)
             startActivity(intent)
         }
+    }
+
+    fun handleBackClick(view: View) {
+        // MainActivity를 시작합니다.
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
+
+        // (선택 사항) 현재 액티비티를 종료합니다.
+        finish()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
