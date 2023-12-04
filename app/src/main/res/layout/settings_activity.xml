@@ -53,33 +53,20 @@ android:background="@color/white">
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_below="@id/guardianModifyButton"
-    android:layout_marginTop="8dp"
+    android:layout_marginTop="30dp"
+    android:clickable="true"
+    android:focusable="true"
     android:text="@string/threat_alarm" />
-
-<!--
-
-<Button
-    android:id="@+id/editProfileButton"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_below="@id/guardianRegisterButton"
-    android:layout_marginTop="8dp"
-    android:background="@drawable/rounded_button"
-    android:text="@string/edit_profile" />
-
-
-<Button
-    android:id="@+id/LoginButton"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_below="@id/editProfileButton"
-    android:layout_marginTop="8dp"
-    android:background="@drawable/rounded_button"
-    android:text="@string/Login" />
--->
-
 <FrameLayout
     android:id="@+id/settings"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" />
+    android:layout_height="wrap_content"
+    android:layout_below="@id/threatAlarmSwitch"
+    android:layout_marginTop="16dp" />
+
+
+<!--FrameLayout
+    android:id="@+id/settings"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" /-->
 </RelativeLayout>

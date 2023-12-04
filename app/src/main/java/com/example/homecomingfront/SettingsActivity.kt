@@ -26,7 +26,8 @@ class SettingsActivity : AppCompatActivity() {
         val sharedPref = getSharedPreferences("AppSettings", Context.MODE_PRIVATE)
         threatAlarmSwitch.isChecked = sharedPref.getBoolean("ThreatAlarmEnabled", false)
 
-        threatAlarmSwitch.setOnCheckedChangeListener { _, isChecked ->
+
+        threatAlarmSwitch.setOnCheckedChangeListener { p0, isChecked ->
             with(sharedPref.edit()) {
                 putBoolean("ThreatAlarmEnabled", isChecked)
                 apply()

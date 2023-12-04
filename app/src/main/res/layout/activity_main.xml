@@ -26,7 +26,7 @@
         android:visibility="visible"
         tools:visibility="visible" />
     <!--android:background="@drawable/image_with_border" -->
-    <ImageButton
+    <!--ImageButton
         android:id="@+id/informationButton"
         android:layout_width="50dp"
         android:layout_height="50dp"
@@ -40,10 +40,10 @@
         android:scaleType="centerInside"
         android:src="@drawable/fxemoji_loudspeaker"
         android:visibility="visible"
-        tools:visibility="visible" />
+        tools:visibility="visible" /-->
 
     <!--android:background="@drawable/image_with_border" -->
-    <ImageButton
+    <!--ImageButton
         android:id="@+id/reportButton"
         android:layout_width="50dp"
         android:layout_height="50dp"
@@ -57,7 +57,7 @@
         android:visibility="visible"
         tools:srcCompat="@drawable/talk"
         tools:visibility="visible"
-        android:contentDescription="@string/talk_description" />
+        android:contentDescription="@string/talk_description" /-->
 
     <!--android:background="@drawable/image_with_border" -->
     <ImageButton
