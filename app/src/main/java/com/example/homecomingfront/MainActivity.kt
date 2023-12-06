@@ -197,8 +197,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     // Retrofit Client Object
     object RetrofitClient {
-        private const val BASE_URL = "http://10.0.2.2:8080/"
-        private const val BASE_URL_terror = "http://10.0.2.2:8080/"
+        private const val BASE_URL = "http://13.209.7.82:8080/"
+        private const val BASE_URL_terror = "http://13.209.7.82:8080/"
 
         val instance: ApiService by lazy {
             val retrofit = Retrofit.Builder()
